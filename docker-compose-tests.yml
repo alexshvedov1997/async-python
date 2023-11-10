@@ -48,6 +48,16 @@ services:
       - app
     networks:
       - interconnect
+  test:
+    image: sprint5_tests
+    env_file:
+      - .env
+    entrypoint: ["/run_tests.sh"]
+    networks:
+      - interconnect
+    depends_on:
+      - app
+      - nginx
 
 volumes:
   pgdata:
