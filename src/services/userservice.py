@@ -1,18 +1,17 @@
+import hashlib
 import logging
 import uuid
-from os import path
-from typing import List, Optional
+from datetime import datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select, update, exists, delete
-from sqlalchemy.ext.asyncio import AsyncSession
-import hashlib
-from core.config import settings
-from models.users import Users, Tokens
-from schemas.users_schemas import TokenSchema, User
-from datetime import datetime
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import delete, exists, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.config import settings
 from core.constants import TokenType
+from models.users import Tokens, Users
+from schemas.users_schemas import TokenSchema, User
 
 _logger = logging.getLogger(__name__)
 
@@ -43,6 +42,9 @@ class UserService:
         results = await session.execute(statement=statement)
         user = results.scalar_one_or_none()
         if not user:
+            _logger.info("User not found {user}".format(
+                user=user_name,
+            ))
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
@@ -55,6 +57,10 @@ class UserService:
         )
         hash_password_str = str(hash_password)
         if not (hash_password_str == user.password):
+            _logger.info("Invalid password for {user} passowrd {password}".format(
+                password=user_password,
+                user=user_name,
+            ))
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Invalid password"
@@ -89,6 +95,7 @@ class UserService:
             )
         token = results.scalar_one_or_none()
         if datetime.utcnow() > token.expire:
+            _logger.info("Token expire {token}".format(token=token))
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Token expire"

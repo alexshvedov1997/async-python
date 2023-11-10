@@ -1,19 +1,19 @@
 import logging
 from logging import config as logging_config
 
+import aioredis
+import boto3
 import uvicorn as uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_pagination import add_pagination
-from core.config import settings
-from core.logger import LOGGING
-from api.v1 import users, files, utils
-import boto3
-from core import s3
-from core.constants import ENDPOINT
-from db import redis
-import aioredis
 
+from api.v1 import files, users, utils
+from core import s3
+from core.config import settings
+from core.constants import ENDPOINT
+from core.logger import LOGGING
+from db import redis
 
 logging_config.dictConfig(LOGGING)
 

@@ -1,18 +1,18 @@
 from typing import Any, List
 
-from db.posgres import get_session
-from fastapi import APIRouter, Depends, status, UploadFile, File, HTTPException
+from aioredis import Redis
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi.responses import Response
 from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.fileservice import FileService
-from fastapi.responses import Response
-from schemas.users_schemas import File as FileSchema
-from typing import List
-from db.redis import get_redis
-from aioredis import Redis
-from services.cache_service import RedisService
-from services.userservice import UserService
+
 from core.auth_params import oauth2_scheme
+from db.posgres import get_session
+from db.redis import get_redis
+from schemas.users_schemas import File as FileSchema
+from services.cache_service import RedisService
+from services.fileservice import FileService
+from services.userservice import UserService
 
 router = APIRouter()
 

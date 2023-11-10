@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Sequence
 from datetime import datetime, timedelta
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+
 from .base import Base
 
 

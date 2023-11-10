@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from typing import Optional
 
@@ -5,8 +6,6 @@ import aiohttp
 import aioredis
 import pytest
 from multidict import CIMultiDictProxy
-
-import json
 from settings import settings
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker

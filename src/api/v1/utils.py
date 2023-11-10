@@ -1,13 +1,14 @@
-from db.posgres import get_session
-from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.users_schemas import ServiceAvailabiltySchema
 from aioredis import Redis
-from db.redis import get_redis
-from services.utils_internal_service import UtilsInternalService
-from services.userservice import UserService
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from core import s3
 from core.auth_params import oauth2_scheme
+from db.posgres import get_session
+from db.redis import get_redis
+from schemas.users_schemas import ServiceAvailabiltySchema
+from services.userservice import UserService
+from services.utils_internal_service import UtilsInternalService
 
 router = APIRouter()
 

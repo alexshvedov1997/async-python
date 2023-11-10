@@ -1,7 +1,6 @@
 from enum import Enum
 
-
-ENDPOINT = "https://storage.yandexcloud.net"
+ENDPOINT: str = "https://storage.yandexcloud.net"
 
 
 class TokenType(Enum):

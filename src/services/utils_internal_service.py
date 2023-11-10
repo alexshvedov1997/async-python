@@ -1,15 +1,18 @@
 import logging
-from sqlalchemy.exc import DatabaseError
-from aioredis import ConnectionClosedError
-from core.config import settings
 from http import HTTPStatus
+
+from aioredis import ConnectionClosedError, Redis
+from sqlalchemy.exc import DatabaseError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.config import settings
 
 _logger = logging.getLogger(__name__)
 
 
 class UtilsInternalService:
 
-    async def check_db(self, session):
+    async def check_db(self, session: AsyncSession) -> bool:
         try:
             result = await session.execute("SELECT version()")
             result.scalar()
@@ -20,7 +23,7 @@ class UtilsInternalService:
             _logger.info("Check db other error {error}".format(error=error))
         return False
 
-    async def check_redis(self, redis):
+    async def check_redis(self, redis: Redis) -> bool:
         try:
             redis.ping()
             return True
@@ -30,7 +33,7 @@ class UtilsInternalService:
             _logger.info("Check redis other error {error}".format(error=error))
         return False
 
-    async def check_s3(self, client):
+    async def check_s3(self, client) -> bool:
         response = None
         try:
             response = client.head_bucket(

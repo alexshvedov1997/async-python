@@ -6,5 +6,5 @@ __all__ = [
 ]
 
 from .base import Base
-from .users import Users, Tokens
 from .files import Files
+from .users import Tokens, Users

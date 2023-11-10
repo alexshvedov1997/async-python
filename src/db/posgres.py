@@ -1,6 +1,7 @@
-from core.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+
+from core.config import settings
 
 DATABASE_DNS = "postgresql+asyncpg://{user}:{password}@{host}:{port}/{db_name}".format(
     user=settings.DB_USER,

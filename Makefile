@@ -9,6 +9,7 @@ help:
 	@echo "	stop"
 	@echo "	up_test"
 	@echo "	down_test"
+	@echo "	build_image_app"
 
 build:
 	docker-compose -f docker-compose.yml  build
@@ -26,3 +27,7 @@ up_test:
     docker-compose -f docker-compose-tests.yml up
 down_test:
     docker-compose -f docker-compose-tests.yml down -v
+build_image_app:
+     docker build -t sprint5 -f dockerization/Dockerfile .
+build_image_tests:
+     docker build -t sprint5-tests -f dockerization/Dockerfile-test .

@@ -1,24 +1,22 @@
 import logging
-import uuid
-from os import path
-from typing import List, Optional
+from typing import List
 
-from fastapi import status, HTTPException
-from sqlalchemy import func, select, update, exists
+from fastapi import HTTPException, status
+from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
-import hashlib
+
+from core import s3
 from core.config import settings
 from models.files import Files
-from core import s3
 from schemas.users_schemas import File
-from copy import deepcopy
+from services.cache_service import RedisService
 
 _logger = logging.getLogger(__name__)
 
 
 class FileService:
 
-    async def upload_file(self, file, session):
+    async def upload_file(self, file, session: AsyncSession) -> None:
         filename = file.filename
         file_path = f"media/{file.filename}"
         file_bytes = file.file.read()
@@ -33,10 +31,18 @@ class FileService:
         await session.commit()
         s3.storage_client.upload_fileobj(file_bytes, settings.BUCKET_NAME, filename)
 
-    async def dowload_file(self, filename, session, redis_service):
+    async def dowload_file(
+            self,
+            filename: str,
+            session: AsyncSession,
+            redis_service: RedisService,
+    ) -> bytes:
         statement = select(exists().where(Files.filename == filename))
         results = await session.execute(statement=statement)
         if not results.scalar_one_or_none():
+            _logger.info("File not found {filename}".format(
+                filename=filename,
+            ))
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="File not found",
@@ -53,7 +59,12 @@ class FileService:
             file_bytes = bytes(data_from)
         return file_bytes
 
-    async def get_files_info(self, session: AsyncSession, page: int, size: int, redis_service):
+    async def get_files_info(
+            self,
+            session: AsyncSession,
+            page: int, size: int,
+            redis_service
+    ) -> List[File]:
         offset = 0
         limit = size
         if page:
