@@ -29,7 +29,7 @@ class UserService:
         )
         user = Users(
             name=user_name,
-            password=str(hash_password),
+            password=hash_password.decode("utf-16"),
         )
         session.add(user)
         await session.commit()
@@ -55,7 +55,7 @@ class UserService:
             settings.SAULT.encode('utf-8'),
             100000
         )
-        hash_password_str = str(hash_password)
+        hash_password_str = hash_password.decode("utf-16")
         if not (hash_password_str == user.password):
             _logger.info("Invalid password for {user} passowrd {password}".format(
                 password=user_password,

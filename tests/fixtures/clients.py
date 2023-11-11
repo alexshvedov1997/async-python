@@ -35,10 +35,10 @@ async def session():
 
 @pytest.fixture
 def make_get_request(session):
-    async def inner(method: str, params: Optional[dict] = None) -> HTTPResponse:
+    async def inner(method: str, params: Optional[dict] = None, headers: Optional[dict] = None) -> HTTPResponse:
         params = params or {}
         url = f'{settings.SERVICE_URL}:{settings.SERVICE_PORT}' + '/api/v1' + method
-        async with session.get(url, params=params) as response:
+        async with session.get(url, params=params, headers=headers) as response:
             return HTTPResponse(
                 body=await response.json(),
                 headers=response.headers,
@@ -51,7 +51,7 @@ def make_get_request(session):
 def make_post_request(session):
     async def inner(method: str, data: Optional[dict] = None) -> HTTPResponse:
         url = f'{settings.SERVICE_URL}:{settings.SERVICE_PORT}' + '/api/v1' + method
-        async with session.post(url, data=data) as response:
+        async with session.post(url, data=json.dumps(data)) as response:
             return HTTPResponse(
                 body=await response.json(),
                 headers=response.headers,
@@ -69,8 +69,4 @@ async def session_db():
         port=settings.DB_PORT,
         db_name=settings.DB_NAME,
     ), echo=True, future=True)
-    async_session = sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False,
-    )
-    yield async_session
-    async_session.close_all()
+    yield engine

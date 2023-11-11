@@ -1,4 +1,5 @@
 import logging
+from os import path
 from typing import List
 
 from fastapi import HTTPException, status
@@ -18,7 +19,7 @@ class FileService:
 
     async def upload_file(self, file, session: AsyncSession) -> None:
         filename = file.filename
-        file_path = f"media/{file.filename}"
+        file_path = path.join("media", file.filename)
         file_bytes = file.file.read()
         size = len(file_bytes)
         file_to_create = Files(

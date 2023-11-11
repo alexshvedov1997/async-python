@@ -17,15 +17,7 @@ from services.userservice import UserService
 router = APIRouter()
 
 
-@router.post(
-    "/upload",
-    status_code=status.HTTP_200_OK,
-)
-async def file_upload(
-        access_token: str = Depends(oauth2_scheme),
-        file: UploadFile = File(...),
-        db: AsyncSession = Depends(get_session)
-):
+async def chek_authorization(access_token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_session)):
     user_id = await UserService().check_user_auth(db, access_token)
     if not user_id:
         raise HTTPException(
@@ -33,6 +25,17 @@ async def file_upload(
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+@router.post(
+    "/upload",
+    status_code=status.HTTP_200_OK,
+)
+async def file_upload(
+        user_id: int = Depends(chek_authorization),
+        file: UploadFile = File(...),
+        db: AsyncSession = Depends(get_session)
+):
     await FileService().upload_file(file, db)
 
 
@@ -40,19 +43,12 @@ async def file_upload(
     "/dowloand",
     status_code=status.HTTP_200_OK,
 )
-async def file_upload(
+async def file_dowload(
         file: str,
-        access_token: str = Depends(oauth2_scheme),
+        user_id: int = Depends(chek_authorization),
         db: AsyncSession = Depends(get_session),
         redis: Redis = Depends(get_redis),
 ):
-    user_id = await UserService().check_user_auth(db, access_token)
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
     redis_service = RedisService(redis)
     data = await FileService().dowload_file(file, db, redis_service)
     response = Response(content=data)
@@ -66,19 +62,11 @@ async def file_upload(
     response_model=List[FileSchema],
 )
 async def get_files_info(
-        access_token: str = Depends(oauth2_scheme),
+        user_id: int = Depends(chek_authorization),
         page: Params = Depends(),
         db: AsyncSession = Depends(get_session),
         redis: Redis = Depends(get_redis),
 ):
-    user_id = await UserService().check_user_auth(db, access_token)
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
     redis_service = RedisService(redis)
     response = await FileService().get_files_info(db, page.page, page.size, redis_service)
     return response
-

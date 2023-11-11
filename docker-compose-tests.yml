@@ -16,7 +16,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
     env_file:
-      - .env
+      - .env.example
     expose:
       - '5432'
     networks:
@@ -29,7 +29,7 @@ services:
       - redis
       - db
     env_file:
-      - .env
+      - .env.example
     entrypoint: ["/start.sh"]
     expose:
       - '8000'
@@ -51,7 +51,7 @@ services:
   test:
     image: sprint5_tests
     env_file:
-      - .env
+      - .env.example
     entrypoint: ["/run_tests.sh"]
     networks:
       - interconnect
